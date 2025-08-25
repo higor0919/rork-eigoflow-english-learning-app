@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Platform, Alert } from 'react-native';
+import { Audio } from 'expo-av';
 
 interface FeedbackItem {
   type: 'grammar' | 'vocabulary' | 'pronunciation' | 'fluency' | 'cultural';
@@ -20,6 +21,9 @@ export function useConversation() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   const getSystemPrompt = (content: string): string => {
     const basePrompt = 'You are an AI English conversation partner for Japanese learners. Respond naturally and provide helpful feedback on their English usage. Keep responses conversational and encouraging.';
@@ -334,28 +338,153 @@ Rules:
   };
 
   const startRecording = async () => {
-    if (Platform.OS === 'web') {
-      Alert.alert('音声認識', 'ウェブ版では音声認識は利用できません。');
-      return;
+    try {
+      if (Platform.OS === 'web') {
+        // Web implementation using MediaRecorder
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+        
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+        
+        mediaRecorder.start();
+        setIsRecording(true);
+        console.log('Web recording started...');
+      } else {
+        // Mobile implementation using expo-av
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('権限が必要です', 'マイクの使用許可が必要です。');
+          return;
+        }
+        
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+        
+        const recording = new Audio.Recording();
+        await recording.prepareToRecordAsync({
+          android: {
+            extension: '.m4a',
+            outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+            audioEncoder: Audio.AndroidAudioEncoder.AAC,
+          },
+          ios: {
+            extension: '.wav',
+            outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+            audioQuality: Audio.IOSAudioQuality.HIGH,
+            sampleRate: 44100,
+            numberOfChannels: 2,
+            bitRate: 128000,
+          },
+          web: {
+            mimeType: 'audio/webm',
+            bitsPerSecond: 128000,
+          },
+        });
+        
+        await recording.startAsync();
+        recordingRef.current = recording;
+        setIsRecording(true);
+        console.log('Mobile recording started...');
+      }
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      Alert.alert('エラー', '録音を開始できませんでした。');
     }
-    
-    setIsRecording(true);
-    console.log('Recording started...');
   };
 
   const stopRecording = async (): Promise<string | null> => {
     setIsRecording(false);
-    console.log('Recording stopped...');
     
-    // Mock transcription for demo
-    const mockTranscriptions = [
-      "Hello, how are you today?",
-      "I would like to practice my English.",
-      "Can you help me with pronunciation?",
-      "What's the weather like?"
-    ];
+    try {
+      if (Platform.OS === 'web') {
+        // Web implementation
+        if (mediaRecorderRef.current) {
+          return new Promise((resolve) => {
+            mediaRecorderRef.current!.onstop = async () => {
+              const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+              
+              // Stop all tracks
+              const stream = mediaRecorderRef.current!.stream;
+              stream.getTracks().forEach(track => track.stop());
+              
+              // Send to speech-to-text API
+              const transcription = await transcribeAudio(audioBlob);
+              resolve(transcription);
+            };
+            
+            mediaRecorderRef.current!.stop();
+          });
+        }
+      } else {
+        // Mobile implementation
+        if (recordingRef.current) {
+          await recordingRef.current.stopAndUnloadAsync();
+          const uri = recordingRef.current.getURI();
+          
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+          
+          if (uri) {
+            // Create file object for mobile
+            const uriParts = uri.split('.');
+            const fileType = uriParts[uriParts.length - 1];
+            
+            const audioFile = {
+              uri,
+              name: "recording." + fileType,
+              type: "audio/" + fileType
+            } as any;
+            
+            // Send to speech-to-text API
+            const transcription = await transcribeAudio(audioFile);
+            recordingRef.current = null;
+            return transcription;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error stopping recording:', error);
+      Alert.alert('エラー', '録音の停止中にエラーが発生しました。');
+    }
     
-    return mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
+    return null;
+  };
+  
+  const transcribeAudio = async (audioData: Blob | any): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      
+      if (Platform.OS === 'web') {
+        // Web: audioData is a Blob
+        formData.append('audio', audioData, 'recording.wav');
+      } else {
+        // Mobile: audioData is a file object with uri, name, type
+        formData.append('audio', audioData);
+      }
+      
+      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Transcription failed');
+      }
+      
+      const data = await response.json();
+      return data.text || null;
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      Alert.alert('エラー', '音声の変換に失敗しました。');
+      return null;
+    }
   };
 
   const playAudio = (text: string) => {
