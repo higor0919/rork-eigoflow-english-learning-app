@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Send, Mic, MicOff, Volume2, RotateCcw } from 'lucide-react-native';
+import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe } from 'lucide-react-native';
 import { useConversation } from '@/hooks/useConversation';
 
 export default function ConversationScreen() {
@@ -142,10 +142,51 @@ export default function ConversationScreen() {
                 )}
               </View>
               
-              {message.feedback && (
+              {message.feedback && message.feedback.length > 0 && (
                 <View style={styles.feedbackContainer}>
-                  <Text style={styles.feedbackTitle}>フィードバック Feedback:</Text>
-                  <Text style={styles.feedbackText}>{message.feedback}</Text>
+                  <Text style={styles.feedbackMainTitle}>📝 詳細フィードバック Detailed Feedback</Text>
+                  {message.feedback.map((item, feedbackIndex) => (
+                    <View key={feedbackIndex} style={[
+                      styles.feedbackItem,
+                      styles[`feedback${item.type.charAt(0).toUpperCase() + item.type.slice(1)}` as keyof typeof styles]
+                    ]}>
+                      <View style={styles.feedbackHeader}>
+                        {item.type === 'grammar' && <AlertCircle size={16} color="#DC2626" />}
+                        {item.type === 'vocabulary' && <BookOpen size={16} color="#7C3AED" />}
+                        {item.type === 'pronunciation' && <Volume2 size={16} color="#EA580C" />}
+                        {item.type === 'fluency' && <Zap size={16} color="#059669" />}
+                        {item.type === 'cultural' && <Globe size={16} color="#0284C7" />}
+                        <Text style={[
+                          styles.feedbackItemTitle,
+                          styles[`feedback${item.type.charAt(0).toUpperCase() + item.type.slice(1)}Text` as keyof typeof styles]
+                        ]}>
+                          {item.title}
+                        </Text>
+                      </View>
+                      
+                      <Text style={styles.feedbackContent}>{item.content}</Text>
+                      
+                      {item.suggestion && (
+                        <View style={styles.suggestionContainer}>
+                          <Text style={styles.suggestionLabel}>💡 提案 Suggestion:</Text>
+                          <Text style={styles.suggestionText}>{item.suggestion}</Text>
+                        </View>
+                      )}
+                      
+                      {item.lessonLink && (
+                        <TouchableOpacity 
+                          style={styles.lessonLink}
+                          onPress={() => {
+                            // Navigate to lesson - for now just show alert
+                            Alert.alert('レッスンリンク', `関連レッスン: ${item.lessonLink}`);
+                          }}
+                        >
+                          <BookOpen size={14} color="#007AFF" />
+                          <Text style={styles.lessonLinkText}>関連レッスンを見る View Related Lesson</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))}
                 </View>
               )}
             </View>
@@ -343,7 +384,7 @@ const styles = StyleSheet.create({
   messageContent: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    maxWidth: '80%',
+    maxWidth: '85%',
   },
   messageText: {
     fontSize: 16,
@@ -381,27 +422,121 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   feedbackContainer: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 12,
+    maxWidth: '95%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  feedbackMainTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 12,
+    fontFamily: 'Inter',
+    textAlign: 'center',
+  },
+  feedbackItem: {
     padding: 12,
     borderRadius: 12,
-    marginTop: 8,
-    maxWidth: '80%',
-    shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: 8,
+    borderLeftWidth: 4,
   },
-  feedbackTitle: {
+  feedbackGrammar: {
+    backgroundColor: '#FEF2F2',
+    borderLeftColor: '#DC2626',
+  },
+  feedbackVocabulary: {
+    backgroundColor: '#FAF5FF',
+    borderLeftColor: '#7C3AED',
+  },
+  feedbackPronunciation: {
+    backgroundColor: '#FFF7ED',
+    borderLeftColor: '#EA580C',
+  },
+  feedbackFluency: {
+    backgroundColor: '#F0FDF4',
+    borderLeftColor: '#059669',
+  },
+  feedbackCultural: {
+    backgroundColor: '#EFF6FF',
+    borderLeftColor: '#0284C7',
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 6,
+  },
+  feedbackItemTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: 'Inter',
+    flex: 1,
+  },
+  feedbackGrammarText: {
+    color: '#DC2626',
+  },
+  feedbackVocabularyText: {
+    color: '#7C3AED',
+  },
+  feedbackPronunciationText: {
+    color: '#EA580C',
+  },
+  feedbackFluencyText: {
+    color: '#059669',
+  },
+  feedbackCulturalText: {
+    color: '#0284C7',
+  },
+  feedbackContent: {
+    fontSize: 13,
+    color: '#374151',
+    lineHeight: 18,
+    marginBottom: 8,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  suggestionContainer: {
+    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  suggestionLabel: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#92400E',
+    fontWeight: '600',
+    color: '#059669',
     marginBottom: 4,
+    fontFamily: 'Inter',
   },
-  feedbackText: {
+  suggestionText: {
     fontSize: 12,
-    color: '#92400E',
+    color: '#065F46',
     lineHeight: 16,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  lessonLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    padding: 8,
+    borderRadius: 8,
+    gap: 4,
+  },
+  lessonLinkText: {
+    fontSize: 12,
+    color: '#007AFF',
+    fontWeight: '600',
+    fontFamily: 'Inter',
   },
   loadingContainer: {
     alignItems: 'center',

@@ -1,10 +1,18 @@
 import { useState } from 'react';
 import { Platform, Alert } from 'react-native';
 
+interface FeedbackItem {
+  type: 'grammar' | 'vocabulary' | 'pronunciation' | 'fluency' | 'cultural';
+  title: string;
+  content: string;
+  suggestion?: string;
+  lessonLink?: string;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  feedback?: string;
+  feedback?: FeedbackItem[];
 }
 
 export function useConversation() {
@@ -81,14 +89,93 @@ export function useConversation() {
     }
   };
 
-  const generateFeedback = (userInput: string): string => {
-    const feedbacks = [
-      '素晴らしい表現です！自然な英語を使えています。',
-      '文法は正しいですが、もう少しカジュアルな表現も試してみましょう。',
-      '良い質問ですね。相手への関心を示す表現が上手です。',
-      '発音に注意して、もう一度練習してみましょう。',
-    ];
-    return feedbacks[Math.floor(Math.random() * feedbacks.length)];
+  const generateFeedback = (userInput: string): FeedbackItem[] => {
+    const feedback: FeedbackItem[] = [];
+    
+    // Grammar analysis
+    if (userInput.toLowerCase().includes('i am go') || userInput.toLowerCase().includes('i go to')) {
+      feedback.push({
+        type: 'grammar',
+        title: '文法修正 Grammar Correction',
+        content: 'Present continuous tense should use "I am going" instead of "I am go"',
+        suggestion: 'Try: "I am going to the store" instead of "I am go to the store"',
+        lessonLink: '/grammar/present-continuous'
+      });
+    }
+    
+    // Vocabulary suggestions
+    if (userInput.toLowerCase().includes('good') && !userInput.toLowerCase().includes('great')) {
+      feedback.push({
+        type: 'vocabulary',
+        title: '語彙提案 Vocabulary Suggestion',
+        content: 'Consider using more varied adjectives to express positive feelings',
+        suggestion: 'Instead of "good", try: "excellent", "wonderful", "fantastic", or "amazing"',
+        lessonLink: '/vocabulary/adjectives'
+      });
+    }
+    
+    // Pronunciation tips
+    if (userInput.toLowerCase().includes('l') || userInput.toLowerCase().includes('r')) {
+      feedback.push({
+        type: 'pronunciation',
+        title: '発音のコツ Pronunciation Tip',
+        content: 'Pay attention to L and R sounds - common challenge for Japanese speakers',
+        suggestion: 'Practice: "light" vs "right", "play" vs "pray". Tongue position is key!',
+        lessonLink: '/pronunciation/l-r-sounds'
+      });
+    }
+    
+    // Fluency feedback
+    if (userInput.length < 10) {
+      feedback.push({
+        type: 'fluency',
+        title: '流暢さ向上 Fluency Enhancement',
+        content: 'Try to elaborate more on your thoughts for better conversation flow',
+        suggestion: 'Add details like "because...", "for example...", or "I think that..."',
+        lessonLink: '/fluency/conversation-fillers'
+      });
+    }
+    
+    // Cultural context
+    if (userInput.toLowerCase().includes('please') || userInput.toLowerCase().includes('thank')) {
+      feedback.push({
+        type: 'cultural',
+        title: '文化的コンテキスト Cultural Context',
+        content: 'Great use of polite expressions! This shows good cultural awareness',
+        suggestion: 'In casual settings, you can also use "thanks" or "cheers" (British)',
+        lessonLink: '/culture/politeness-levels'
+      });
+    }
+    
+    // Always provide at least one positive feedback
+    if (feedback.length === 0) {
+      const positiveFeedback = [
+        {
+          type: 'fluency' as const,
+          title: '素晴らしい！ Excellent!',
+          content: 'Your English is clear and natural. Keep up the great work!',
+          suggestion: 'Continue practicing to build confidence in longer conversations',
+          lessonLink: '/progress/confidence-building'
+        },
+        {
+          type: 'vocabulary' as const,
+          title: '語彙力 Vocabulary Strength',
+          content: 'Good word choice! You\'re using appropriate vocabulary for the context',
+          suggestion: 'Try incorporating some idiomatic expressions to sound more natural',
+          lessonLink: '/vocabulary/idioms'
+        },
+        {
+          type: 'grammar' as const,
+          title: '文法正確 Grammar Accuracy',
+          content: 'Your sentence structure is correct and easy to understand',
+          suggestion: 'Experiment with more complex sentence patterns when you feel ready',
+          lessonLink: '/grammar/complex-sentences'
+        }
+      ];
+      feedback.push(positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)]);
+    }
+    
+    return feedback;
   };
 
   const startRecording = async () => {
