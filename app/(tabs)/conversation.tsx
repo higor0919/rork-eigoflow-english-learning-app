@@ -142,7 +142,7 @@ export default function ConversationScreen() {
                 )}
               </View>
               
-              {message.feedback && message.feedback.length > 0 && (
+              {message.feedback && Array.isArray(message.feedback) && message.feedback.length > 0 && (
                 <View style={styles.feedbackContainer}>
                   <Text style={styles.feedbackMainTitle}>📝 詳細フィードバック Detailed Feedback</Text>
                   {message.feedback.map((item, feedbackIndex) => (
