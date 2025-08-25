@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform, KeyboardAvoidingView, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe, Coffee, Briefcase, MapPin, UtensilsCrossed, Code, ChefHat, Users, Train, Handshake, Bot, Clock, Info } from 'lucide-react-native';
+import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe, Coffee, Briefcase, MapPin, UtensilsCrossed, Code, ChefHat, Users, Train, Handshake, Bot, Clock, Info, X, CheckCircle, AlertTriangle, Lightbulb, Star, Globe2 } from 'lucide-react-native';
 import { useConversation } from '@/hooks/useConversation';
 
 export default function ConversationScreen() {
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedFeedback, setSelectedFeedback] = useState<any>(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   
   const { 
@@ -196,9 +198,8 @@ export default function ConversationScreen() {
                 <TouchableOpacity 
                   style={styles.feedbackToggle}
                   onPress={() => {
-                    // For now, show alert with feedback - in a real app this would expand/collapse
-                    const feedbackText = message.feedback?.map((item: any) => `${item.title}: ${item.content}`).join('\n\n') || '';
-                    Alert.alert('📝 詳細フィードバック Detailed Feedback', feedbackText);
+                    setSelectedFeedback(message.feedback);
+                    setShowFeedbackModal(true);
                   }}
                 >
                   <Info size={16} color="#007AFF" />
@@ -217,6 +218,113 @@ export default function ConversationScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Feedback Modal */}
+      <Modal
+        visible={showFeedbackModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowFeedbackModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>📝 詳細フィードバック</Text>
+            <Text style={styles.modalSubtitle}>Detailed Feedback</Text>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowFeedbackModal(false)}
+            >
+              <X size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+            {selectedFeedback && Array.isArray(selectedFeedback) && selectedFeedback.map((item: any, index: number) => {
+              const getIcon = (type: string) => {
+                switch (type) {
+                  case 'grammar': return <CheckCircle size={20} color="#DC2626" />;
+                  case 'vocabulary': return <Star size={20} color="#7C3AED" />;
+                  case 'pronunciation': return <Volume2 size={20} color="#EA580C" />;
+                  case 'fluency': return <Zap size={20} color="#059669" />;
+                  case 'cultural': return <Globe2 size={20} color="#0284C7" />;
+                  default: return <Lightbulb size={20} color="#6B7280" />;
+                }
+              };
+              
+              const getBackgroundColor = (type: string) => {
+                switch (type) {
+                  case 'grammar': return '#FEF2F2';
+                  case 'vocabulary': return '#FAF5FF';
+                  case 'pronunciation': return '#FFF7ED';
+                  case 'fluency': return '#F0FDF4';
+                  case 'cultural': return '#EFF6FF';
+                  default: return '#F9FAFB';
+                }
+              };
+              
+              const getBorderColor = (type: string) => {
+                switch (type) {
+                  case 'grammar': return '#DC2626';
+                  case 'vocabulary': return '#7C3AED';
+                  case 'pronunciation': return '#EA580C';
+                  case 'fluency': return '#059669';
+                  case 'cultural': return '#0284C7';
+                  default: return '#6B7280';
+                }
+              };
+              
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.feedbackCard,
+                    {
+                      backgroundColor: getBackgroundColor(item.type),
+                      borderLeftColor: getBorderColor(item.type)
+                    }
+                  ]}
+                >
+                  <View style={styles.feedbackCardHeader}>
+                    {getIcon(item.type)}
+                    <Text style={[
+                      styles.feedbackCardTitle,
+                      { color: getBorderColor(item.type) }
+                    ]}>
+                      {item.title || 'フィードバック'}
+                    </Text>
+                  </View>
+                  
+                  <Text style={styles.feedbackCardContent}>
+                    {item.content || 'フィードバックが利用できません。'}
+                  </Text>
+                  
+                  {item.suggestion && (
+                    <View style={styles.suggestionCard}>
+                      <Text style={styles.suggestionLabel}>💡 提案 Suggestion:</Text>
+                      <Text style={styles.suggestionText}>{item.suggestion}</Text>
+                    </View>
+                  )}
+                  
+                  {item.lessonLink && (
+                    <TouchableOpacity style={styles.lessonButton}>
+                      <BookOpen size={16} color="#007AFF" />
+                      <Text style={styles.lessonButtonText}>関連レッスンを見る</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              );
+            })}
+            
+            {(!selectedFeedback || !Array.isArray(selectedFeedback) || selectedFeedback.length === 0) && (
+              <View style={styles.noFeedbackContainer}>
+                <AlertTriangle size={48} color="#9CA3AF" />
+                <Text style={styles.noFeedbackTitle}>フィードバックがありません</Text>
+                <Text style={styles.noFeedbackText}>No feedback available for this message.</Text>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
 
       {/* Input Area */}
       <View style={styles.inputContainer}>
@@ -606,26 +714,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: '400',
   },
-  suggestionContainer: {
-    backgroundColor: 'rgba(52, 199, 89, 0.1)',
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  suggestionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#059669',
-    marginBottom: 4,
-    fontFamily: 'Inter',
-  },
-  suggestionText: {
-    fontSize: 12,
-    color: '#065F46',
-    lineHeight: 16,
-    fontFamily: 'Inter',
-    fontWeight: '400',
-  },
+
   lessonLink: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -717,6 +806,138 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#FF3B30',
     fontWeight: '500',
+    fontFamily: 'Inter',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  modalHeader: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 4,
+    fontFamily: 'Inter',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  feedbackCard: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  feedbackCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  feedbackCardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'Inter',
+    flex: 1,
+  },
+  feedbackCardContent: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+    marginBottom: 12,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  suggestionCard: {
+    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  suggestionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#059669',
+    marginBottom: 4,
+    fontFamily: 'Inter',
+  },
+  suggestionText: {
+    fontSize: 13,
+    color: '#065F46',
+    lineHeight: 18,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  lessonButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+    alignSelf: 'flex-start',
+  },
+  lessonButtonText: {
+    fontSize: 12,
+    color: '#007AFF',
+    fontWeight: '600',
+    fontFamily: 'Inter',
+  },
+  noFeedbackContainer: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  noFeedbackTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginTop: 16,
+    marginBottom: 8,
+    fontFamily: 'Inter',
+  },
+  noFeedbackText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
     fontFamily: 'Inter',
   },
 
