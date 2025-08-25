@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe } from 'lucide-react-native';
+import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe, Coffee, Briefcase, MapPin, UtensilsCrossed, Code, ChefHat, Users, Train, Handshake, Bot, Clock, Info } from 'lucide-react-native';
 import { useConversation } from '@/hooks/useConversation';
 
 export default function ConversationScreen() {
@@ -49,15 +49,15 @@ export default function ConversationScreen() {
   };
 
   const scenarios = [
-    { id: 'casual', title: 'カジュアル会話', subtitle: 'Casual Conversation' },
-    { id: 'business', title: 'ビジネス会話', subtitle: 'Business Meeting' },
-    { id: 'travel', title: '旅行会話', subtitle: 'Travel Situations' },
-    { id: 'restaurant', title: 'レストラン', subtitle: 'Restaurant Ordering' },
-    { id: 'job-interview-it', title: 'IT業界面接', subtitle: 'Job Interview Practice (IT Sector)' },
-    { id: 'japanese-restaurant', title: '和食レストラン', subtitle: 'Ordering at a Traditional Japanese Restaurant (in English)' },
-    { id: 'cultural-discussion', title: '文化紹介', subtitle: 'Discussing Japanese Culture with a Foreigner' },
-    { id: 'train-station', title: '駅での案内', subtitle: 'Navigating a Train Station in English' },
-    { id: 'networking', title: 'ビジネス交流', subtitle: 'Making Small Talk at a Business Networking Event' },
+    { id: 'casual', title: 'カジュアル会話', subtitle: 'Casual Conversation', icon: Coffee },
+    { id: 'business', title: 'ビジネス会話', subtitle: 'Business Meeting', icon: Briefcase },
+    { id: 'travel', title: '旅行会話', subtitle: 'Travel Situations', icon: MapPin },
+    { id: 'restaurant', title: 'レストラン', subtitle: 'Restaurant Ordering', icon: UtensilsCrossed },
+    { id: 'job-interview-it', title: 'IT業界面接', subtitle: 'Job Interview Practice (IT Sector)', icon: Code },
+    { id: 'japanese-restaurant', title: '和食レストラン', subtitle: 'Ordering at a Traditional Japanese Restaurant (in English)', icon: ChefHat },
+    { id: 'cultural-discussion', title: '文化紹介', subtitle: 'Discussing Japanese Culture with a Foreigner', icon: Users },
+    { id: 'train-station', title: '駅での案内', subtitle: 'Navigating a Train Station in English', icon: Train },
+    { id: 'networking', title: 'ビジネス交流', subtitle: 'Making Small Talk at a Business Networking Event', icon: Handshake },
   ];
 
   return (
@@ -67,39 +67,44 @@ export default function ConversationScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       {/* Header */}
-      <LinearGradient
-        colors={['#007AFF', '#5AC8FA']}
-        style={styles.header}
-      >
+      <View style={styles.header}>
+        <View style={styles.headerAccent} />
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>AI会話練習</Text>
-          <Text style={styles.headerSubtitle}>AI-Powered Conversation Practice</Text>
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>AI会話練習</Text>
+            <Text style={styles.headerSubtitle}>AI-Powered Conversation Practice</Text>
+          </View>
           
           <TouchableOpacity 
             style={styles.resetButton}
             onPress={resetConversation}
           >
-            <RotateCcw size={16} color="#FFFFFF" />
-            <Text style={styles.resetButtonText}>新しい会話</Text>
+            <RotateCcw size={18} color="#007AFF" />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Scenario Selection */}
       {messages.length === 0 && (
         <View style={styles.scenarioSection}>
           <Text style={styles.scenarioTitle}>会話シナリオを選択 Choose a Scenario</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scenarioScroll}>
-            {scenarios.map((scenario) => (
-              <TouchableOpacity
-                key={scenario.id}
-                style={styles.scenarioCard}
-                onPress={() => sendMessage(`Let's practice ${scenario.subtitle.toLowerCase()}`)}
-              >
-                <Text style={styles.scenarioCardTitle}>{scenario.title}</Text>
-                <Text style={styles.scenarioCardSubtitle}>{scenario.subtitle}</Text>
-              </TouchableOpacity>
-            ))}
+            {scenarios.map((scenario) => {
+              const IconComponent = scenario.icon;
+              return (
+                <TouchableOpacity
+                  key={scenario.id}
+                  style={styles.scenarioCard}
+                  onPress={() => sendMessage(`Let's practice ${scenario.subtitle.toLowerCase()}`)}
+                >
+                  <View style={styles.scenarioIconContainer}>
+                    <IconComponent size={20} color="#007AFF" />
+                  </View>
+                  <Text style={styles.scenarioCardTitle}>{scenario.title}</Text>
+                  <Text style={styles.scenarioCardSubtitle}>{scenario.subtitle}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
       )}
@@ -113,6 +118,10 @@ export default function ConversationScreen() {
       >
         {messages.length === 0 ? (
           <View style={styles.welcomeContainer}>
+            <View style={styles.welcomeIllustration}>
+              <Bot size={48} color="#007AFF" />
+              <MessageSquare size={32} color="#5AC8FA" style={styles.welcomeMessageIcon} />
+            </View>
             <Text style={styles.welcomeTitle}>AIアシスタントと会話を始めましょう！</Text>
             <Text style={styles.welcomeSubtitle}>Start a conversation with your AI assistant!</Text>
             <Text style={styles.welcomeDescription}>
@@ -128,70 +137,53 @@ export default function ConversationScreen() {
                 message.role === 'user' ? styles.userMessage : styles.aiMessage
               ]}
             >
+              {message.role === 'assistant' && (
+                <View style={styles.aiAvatar}>
+                  <Bot size={16} color="#FFFFFF" />
+                </View>
+              )}
+              
               <View style={styles.messageContent}>
-                <Text style={[
-                  styles.messageText,
-                  message.role === 'user' ? styles.userMessageText : styles.aiMessageText
+                <View style={[
+                  styles.messageBubble,
+                  message.role === 'user' ? styles.userMessageBubble : styles.aiMessageBubble
                 ]}>
-                  {message.content}
-                </Text>
+                  <Text style={[
+                    styles.messageText,
+                    message.role === 'user' ? styles.userMessageText : styles.aiMessageText
+                  ]}>
+                    {message.content}
+                  </Text>
+                </View>
                 
-                {message.role === 'assistant' && (
-                  <TouchableOpacity
-                    style={styles.playButton}
-                    onPress={() => playAudio(message.content)}
-                  >
-                    <Volume2 size={16} color="#6B7280" />
-                  </TouchableOpacity>
-                )}
+                <View style={styles.messageFooter}>
+                  <Text style={styles.messageTimestamp}>
+                    {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                  </Text>
+                  
+                  {message.role === 'assistant' && (
+                    <TouchableOpacity
+                      style={styles.playButton}
+                      onPress={() => playAudio(message.content)}
+                    >
+                      <Volume2 size={14} color="#9CA3AF" />
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
               
-              {message.feedback && Array.isArray(message.feedback) && message.feedback.length > 0 && (
-                <View style={styles.feedbackContainer}>
-                  <Text style={styles.feedbackMainTitle}>📝 詳細フィードバック Detailed Feedback</Text>
-                  {message.feedback.map((item, feedbackIndex) => (
-                    <View key={feedbackIndex} style={[
-                      styles.feedbackItem,
-                      styles[`feedback${item.type.charAt(0).toUpperCase() + item.type.slice(1)}` as keyof typeof styles]
-                    ]}>
-                      <View style={styles.feedbackHeader}>
-                        {item.type === 'grammar' && <AlertCircle size={16} color="#DC2626" />}
-                        {item.type === 'vocabulary' && <BookOpen size={16} color="#7C3AED" />}
-                        {item.type === 'pronunciation' && <Volume2 size={16} color="#EA580C" />}
-                        {item.type === 'fluency' && <Zap size={16} color="#059669" />}
-                        {item.type === 'cultural' && <Globe size={16} color="#0284C7" />}
-                        <Text style={[
-                          styles.feedbackItemTitle,
-                          styles[`feedback${item.type.charAt(0).toUpperCase() + item.type.slice(1)}Text` as keyof typeof styles]
-                        ]}>
-                          {item.title}
-                        </Text>
-                      </View>
-                      
-                      <Text style={styles.feedbackContent}>{item.content}</Text>
-                      
-                      {item.suggestion && (
-                        <View style={styles.suggestionContainer}>
-                          <Text style={styles.suggestionLabel}>💡 提案 Suggestion:</Text>
-                          <Text style={styles.suggestionText}>{item.suggestion}</Text>
-                        </View>
-                      )}
-                      
-                      {item.lessonLink && (
-                        <TouchableOpacity 
-                          style={styles.lessonLink}
-                          onPress={() => {
-                            // Navigate to lesson - for now just show alert
-                            Alert.alert('レッスンリンク', `関連レッスン: ${item.lessonLink}`);
-                          }}
-                        >
-                          <BookOpen size={14} color="#007AFF" />
-                          <Text style={styles.lessonLinkText}>関連レッスンを見る View Related Lesson</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  ))}
-                </View>
+              {message.role === 'assistant' && message.feedback && Array.isArray(message.feedback) && message.feedback.length > 0 && (
+                <TouchableOpacity 
+                  style={styles.feedbackToggle}
+                  onPress={() => {
+                    // For now, show alert with feedback - in a real app this would expand/collapse
+                    const feedbackText = message.feedback?.map((item: any) => `${item.title}: ${item.content}`).join('\n\n') || '';
+                    Alert.alert('📝 詳細フィードバック Detailed Feedback', feedbackText);
+                  }}
+                >
+                  <Info size={16} color="#007AFF" />
+                  <Text style={styles.feedbackToggleText}>フィードバックを見る View Feedback</Text>
+                </TouchableOpacity>
               )}
               
 
@@ -208,7 +200,7 @@ export default function ConversationScreen() {
 
       {/* Input Area */}
       <View style={styles.inputContainer}>
-        <View style={styles.inputRow}>
+        <View style={styles.inputBar}>
           <TextInput
             style={styles.textInput}
             value={inputText}
@@ -224,9 +216,9 @@ export default function ConversationScreen() {
             onPress={handleMicPress}
           >
             {isRecording ? (
-              <MicOff size={20} color="#FFFFFF" />
+              <MicOff size={18} color="#FFFFFF" />
             ) : (
-              <Mic size={20} color="#FFFFFF" />
+              <Mic size={18} color={isRecording ? '#FFFFFF' : '#FF3B30'} />
             )}
           </TouchableOpacity>
           
@@ -235,12 +227,15 @@ export default function ConversationScreen() {
             onPress={handleSendMessage}
             disabled={!inputText.trim() || isLoading}
           >
-            <Send size={20} color="#FFFFFF" />
+            <Send size={18} color={inputText.trim() ? '#FFFFFF' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
         
         {isRecording && (
-          <Text style={styles.recordingText}>🎤 録音中... Recording...</Text>
+          <View style={styles.recordingIndicator}>
+            <View style={styles.recordingPulse} />
+            <Text style={styles.recordingText}>🎤 録音中... Recording...</Text>
+          </View>
         )}
       </View>
     </KeyboardAvoidingView>
@@ -253,48 +248,67 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   header: {
+    backgroundColor: '#FFFFFF',
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  headerAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: '#007AFF',
   },
   headerContent: {
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 6,
-    fontFamily: 'Inter',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  headerSubtitle: {
-    fontSize: 17,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 20,
-    fontFamily: 'Inter',
-    fontWeight: '400',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    justifyContent: 'space-between',
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 4,
+    fontFamily: 'Inter',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontFamily: 'Inter',
+    fontWeight: '400',
+  },
+  resetButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  scenarioIconContainer: {
+    width: 32,
+    height: 32,
     borderRadius: 16,
-    gap: 4,
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   resetButtonText: {
     color: '#FFFFFF',
@@ -318,16 +332,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   scenarioCard: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
     padding: 18,
-    borderRadius: 20,
+    borderRadius: 16,
     marginRight: 16,
-    minWidth: 150,
+    minWidth: 160,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
   },
   scenarioCardTitle: {
     fontSize: 15,
@@ -353,6 +369,18 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     alignItems: 'center',
     paddingVertical: 40,
+  },
+  welcomeIllustration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    position: 'relative',
+  },
+  welcomeMessageIcon: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
   },
   welcomeTitle: {
     fontSize: 22,
@@ -380,53 +408,89 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   messageContainer: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   userMessage: {
     alignItems: 'flex-end',
   },
   aiMessage: {
     alignItems: 'flex-start',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  aiAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 4,
   },
   messageContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flex: 1,
     maxWidth: '85%',
+  },
+  messageBubble: {
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  userMessageBubble: {
+    backgroundColor: '#007AFF',
+    borderBottomRightRadius: 4,
+  },
+  aiMessageBubble: {
+    backgroundColor: '#FFFFFF',
+    borderBottomLeftRadius: 4,
+  },
+  messageFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+    paddingHorizontal: 4,
+  },
+  messageTimestamp: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    fontFamily: 'Inter',
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 24,
-    flex: 1,
+    lineHeight: 22,
     fontFamily: 'Inter',
     fontWeight: '400',
+    padding: 14,
   },
   userMessageText: {
-    backgroundColor: '#007AFF',
     color: '#FFFFFF',
-    padding: 12,
-    borderRadius: 20,
-    borderBottomRightRadius: 6,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   aiMessageText: {
-    backgroundColor: '#FFFFFF',
     color: '#1F2937',
-    padding: 12,
-    borderRadius: 20,
-    borderBottomLeftRadius: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
   },
   playButton: {
-    marginLeft: 8,
     padding: 4,
+  },
+  feedbackToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginTop: 8,
+    marginLeft: 36,
+    gap: 6,
+  },
+  feedbackToggleText: {
+    fontSize: 12,
+    color: '#007AFF',
+    fontWeight: '600',
+    fontFamily: 'Inter',
   },
   feedbackContainer: {
     backgroundColor: '#FFFFFF',
@@ -555,24 +619,28 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   inputContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
-  inputRow: {
+  inputBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
     gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   textInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 16,
     maxHeight: 100,
     color: '#1F2937',
@@ -580,32 +648,45 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   micButton: {
-    backgroundColor: '#FF3B30',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    backgroundColor: '#F3F4F6',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   micButtonActive: {
-    backgroundColor: '#D70015',
+    backgroundColor: '#FF3B30',
   },
   sendButton: {
     backgroundColor: '#007AFF',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: '#E5E7EB',
+  },
+  recordingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  recordingPulse: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FF3B30',
   },
   recordingText: {
     fontSize: 12,
-    color: '#EF4444',
-    textAlign: 'center',
-    marginTop: 8,
+    color: '#FF3B30',
+    fontWeight: '500',
+    fontFamily: 'Inter',
   },
 
 });
