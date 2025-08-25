@@ -53,6 +53,11 @@ export default function ConversationScreen() {
     { id: 'business', title: 'ビジネス会話', subtitle: 'Business Meeting' },
     { id: 'travel', title: '旅行会話', subtitle: 'Travel Situations' },
     { id: 'restaurant', title: 'レストラン', subtitle: 'Restaurant Ordering' },
+    { id: 'job-interview-it', title: 'IT業界面接', subtitle: 'Job Interview Practice (IT Sector)' },
+    { id: 'japanese-restaurant', title: '和食レストラン', subtitle: 'Ordering at a Traditional Japanese Restaurant (in English)' },
+    { id: 'cultural-discussion', title: '文化紹介', subtitle: 'Discussing Japanese Culture with a Foreigner' },
+    { id: 'train-station', title: '駅での案内', subtitle: 'Navigating a Train Station in English' },
+    { id: 'networking', title: 'ビジネス交流', subtitle: 'Making Small Talk at a Business Networking Event' },
   ];
 
   return (

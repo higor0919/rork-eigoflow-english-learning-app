@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Platform, Alert } from 'react-native';
 
 interface Message {
@@ -12,12 +12,41 @@ export function useConversation() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   
+  const getSystemPrompt = (content: string): string => {
+    const basePrompt = 'You are an AI English conversation partner for Japanese learners. Respond naturally and provide helpful feedback on their English usage. Keep responses conversational and encouraging.';
+    
+    // Detect scenario type from the initial message
+    if (content.toLowerCase().includes('job interview') && content.toLowerCase().includes('it')) {
+      return `${basePrompt} You are now role-playing as an IT company interviewer. Ask relevant technical and behavioral questions, provide realistic interview scenarios, and give constructive feedback on professional communication skills.`;
+    }
+    
+    if (content.toLowerCase().includes('traditional japanese restaurant')) {
+      return `${basePrompt} You are now role-playing as a server at a traditional Japanese restaurant who speaks English with foreign customers. Help the user practice ordering Japanese dishes, asking about ingredients, and understanding restaurant etiquette in English.`;
+    }
+    
+    if (content.toLowerCase().includes('japanese culture')) {
+      return `${basePrompt} You are now role-playing as a curious foreigner interested in learning about Japanese culture. Ask thoughtful questions about Japanese traditions, customs, food, and daily life, helping the user practice explaining their culture in English.`;
+    }
+    
+    if (content.toLowerCase().includes('train station')) {
+      return `${basePrompt} You are now role-playing as both a train station staff member and confused tourists. Create scenarios where the user needs to give directions, explain train systems, help with ticket purchases, and handle various station-related situations in English.`;
+    }
+    
+    if (content.toLowerCase().includes('business networking')) {
+      return `${basePrompt} You are now role-playing as various professionals at a business networking event. Practice small talk, professional introductions, discussing work and industry trends, and making meaningful business connections in English.`;
+    }
+    
+    return basePrompt;
+  };
+
   const sendMessage = async (content: string) => {
     const userMessage: Message = { role: 'user', content };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
     try {
+      const systemPrompt = getSystemPrompt(content);
+      
       const response = await fetch('https://toolkit.rork.com/text/llm/', {
         method: 'POST',
         headers: {
@@ -27,7 +56,7 @@ export function useConversation() {
           messages: [
             {
               role: 'system',
-              content: 'You are an AI English conversation partner for Japanese learners. Respond naturally and provide helpful feedback on their English usage. Keep responses conversational and encouraging.'
+              content: systemPrompt
             },
             ...messages.map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content }
