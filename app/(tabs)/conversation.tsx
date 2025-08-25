@@ -137,40 +137,60 @@ export default function ConversationScreen() {
                 message.role === 'user' ? styles.userMessage : styles.aiMessage
               ]}
             >
-              {message.role === 'assistant' && (
-                <View style={styles.aiAvatar}>
-                  <Bot size={16} color="#FFFFFF" />
+              {message.role === 'assistant' ? (
+                <View style={styles.aiMessageRow}>
+                  <View style={styles.aiAvatar}>
+                    <Bot size={16} color="#FFFFFF" />
+                  </View>
+                  
+                  <View style={styles.messageContent}>
+                    <View style={[
+                      styles.messageBubble,
+                      styles.aiMessageBubble
+                    ]}>
+                      <Text style={[
+                        styles.messageText,
+                        styles.aiMessageText
+                      ]}>
+                        {message.content}
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.messageFooter}>
+                      <Text style={styles.messageTimestamp}>
+                        {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                      
+                      <TouchableOpacity
+                        style={styles.playButton}
+                        onPress={() => playAudio(message.content)}
+                      >
+                        <Volume2 size={14} color="#9CA3AF" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.messageContent}>
+                  <View style={[
+                    styles.messageBubble,
+                    styles.userMessageBubble
+                  ]}>
+                    <Text style={[
+                      styles.messageText,
+                      styles.userMessageText
+                    ]}>
+                      {message.content}
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.messageFooter}>
+                    <Text style={styles.messageTimestamp}>
+                      {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </View>
                 </View>
               )}
-              
-              <View style={styles.messageContent}>
-                <View style={[
-                  styles.messageBubble,
-                  message.role === 'user' ? styles.userMessageBubble : styles.aiMessageBubble
-                ]}>
-                  <Text style={[
-                    styles.messageText,
-                    message.role === 'user' ? styles.userMessageText : styles.aiMessageText
-                  ]}>
-                    {message.content}
-                  </Text>
-                </View>
-                
-                <View style={styles.messageFooter}>
-                  <Text style={styles.messageTimestamp}>
-                    {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                  
-                  {message.role === 'assistant' && (
-                    <TouchableOpacity
-                      style={styles.playButton}
-                      onPress={() => playAudio(message.content)}
-                    >
-                      <Volume2 size={14} color="#9CA3AF" />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
               
               {message.role === 'assistant' && message.feedback && Array.isArray(message.feedback) && message.feedback.length > 0 && (
                 <TouchableOpacity 
@@ -418,8 +438,6 @@ const styles = StyleSheet.create({
   },
   aiMessage: {
     alignItems: 'flex-start',
-    flexDirection: 'row',
-    gap: 8,
     width: '100%',
   },
   aiAvatar: {
@@ -435,6 +453,12 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: '85%',
     minWidth: 0,
+  },
+  aiMessageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    width: '100%',
   },
   messageBubble: {
     borderRadius: 18,
