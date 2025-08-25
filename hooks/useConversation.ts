@@ -13,6 +13,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   feedback?: FeedbackItem[];
+  followUpQuestion?: string;
 }
 
 export function useConversation() {
@@ -54,6 +55,19 @@ export function useConversation() {
 
     try {
       const systemPrompt = getSystemPrompt(content);
+      const conversationHistory = messages.map(m => ({ role: m.role, content: m.content }));
+      
+      // Enhanced system prompt for follow-up questions
+      const enhancedPrompt = `${systemPrompt}
+
+IMPORTANT: After providing your response, generate a thoughtful follow-up question that:
+1. Encourages the user to elaborate on their thoughts
+2. Pushes their communicative abilities
+3. Maintains conversational context
+4. Goes beyond simple acknowledgments
+5. Is relevant to the current conversation topic
+
+Format your response as: [YOUR_RESPONSE]\n\n[FOLLOW_UP_QUESTION]`;
       
       const response = await fetch('https://toolkit.rork.com/text/llm/', {
         method: 'POST',
@@ -64,9 +78,9 @@ export function useConversation() {
           messages: [
             {
               role: 'system',
-              content: systemPrompt
+              content: enhancedPrompt
             },
-            ...messages.map(m => ({ role: m.role, content: m.content })),
+            ...conversationHistory,
             { role: 'user', content }
           ]
         }),
@@ -74,10 +88,17 @@ export function useConversation() {
 
       const data = await response.json();
       
+      // Parse response and follow-up question
+      const fullResponse = data.completion;
+      const parts = fullResponse.split('\n\n');
+      const mainResponse = parts[0] || fullResponse;
+      const followUpQuestion = parts.length > 1 ? parts[parts.length - 1] : generateFollowUpQuestion(content, mainResponse);
+      
       const aiMessage: Message = {
         role: 'assistant',
-        content: data.completion,
-        feedback: generateFeedback(content)
+        content: mainResponse,
+        feedback: generateFeedback(content),
+        followUpQuestion: followUpQuestion
       };
       
       setMessages(prev => [...prev, aiMessage]);
@@ -176,6 +197,56 @@ export function useConversation() {
     }
     
     return feedback;
+  };
+
+  const generateFollowUpQuestion = (userInput: string, aiResponse: string): string => {
+    const followUpQuestions = {
+      business: [
+        "What challenges do you think you might face in that situation?",
+        "How would you handle a disagreement in that context?",
+        "Can you tell me more about your experience with similar situations?",
+        "What would be your next step if that didn't work out as planned?"
+      ],
+      travel: [
+        "What's the most interesting place you've visited recently?",
+        "How do you usually prepare for trips to new places?",
+        "What would you do if you encountered that problem while traveling?",
+        "Can you describe a memorable travel experience you've had?"
+      ],
+      casual: [
+        "What do you think about that topic?",
+        "How does that compare to your experience in Japan?",
+        "What would you do differently in that situation?",
+        "Can you elaborate on why you feel that way?"
+      ],
+      cultural: [
+        "How do you think foreigners perceive that aspect of Japanese culture?",
+        "What's something about Japanese culture that you're particularly proud of?",
+        "How would you explain that cultural difference to someone from another country?",
+        "What questions do foreigners usually ask you about Japan?"
+      ],
+      restaurant: [
+        "What's your favorite type of cuisine and why?",
+        "How would you recommend that dish to someone who's never tried it?",
+        "What dining etiquette differences have you noticed between countries?",
+        "Can you describe the atmosphere of your favorite restaurant?"
+      ]
+    };
+
+    // Determine context from user input
+    let context = 'casual';
+    if (userInput.toLowerCase().includes('business') || userInput.toLowerCase().includes('work') || userInput.toLowerCase().includes('job')) {
+      context = 'business';
+    } else if (userInput.toLowerCase().includes('travel') || userInput.toLowerCase().includes('trip') || userInput.toLowerCase().includes('station')) {
+      context = 'travel';
+    } else if (userInput.toLowerCase().includes('culture') || userInput.toLowerCase().includes('japanese') || userInput.toLowerCase().includes('tradition')) {
+      context = 'cultural';
+    } else if (userInput.toLowerCase().includes('restaurant') || userInput.toLowerCase().includes('food') || userInput.toLowerCase().includes('order')) {
+      context = 'restaurant';
+    }
+
+    const questions = followUpQuestions[context as keyof typeof followUpQuestions];
+    return questions[Math.floor(Math.random() * questions.length)];
   };
 
   const startRecording = async () => {

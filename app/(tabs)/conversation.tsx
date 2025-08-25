@@ -189,6 +189,22 @@ export default function ConversationScreen() {
                   ))}
                 </View>
               )}
+              
+              {message.role === 'assistant' && message.followUpQuestion && (
+                <TouchableOpacity 
+                  style={styles.followUpContainer}
+                  onPress={() => {
+                    setInputText(message.followUpQuestion || '');
+                  }}
+                >
+                  <View style={styles.followUpHeader}>
+                    <MessageSquare size={16} color="#007AFF" />
+                    <Text style={styles.followUpTitle}>💭 続けて話してみましょう Continue the Conversation</Text>
+                  </View>
+                  <Text style={styles.followUpQuestion}>{message.followUpQuestion}</Text>
+                  <Text style={styles.followUpHint}>タップして回答 Tap to respond</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ))
         )}
@@ -598,5 +614,48 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     textAlign: 'center',
     marginTop: 8,
+  },
+  followUpContainer: {
+    backgroundColor: '#F0F9FF',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 12,
+    maxWidth: '95%',
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  followUpHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 6,
+  },
+  followUpTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#007AFF',
+    fontFamily: 'Inter',
+    flex: 1,
+  },
+  followUpQuestion: {
+    fontSize: 15,
+    color: '#1F2937',
+    lineHeight: 22,
+    marginBottom: 8,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+  },
+  followUpHint: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
 });
