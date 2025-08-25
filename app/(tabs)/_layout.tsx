@@ -13,14 +13,15 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E7EB',
-          paddingTop: 8,
-          paddingBottom: 8,
-          height: 80,
+          paddingTop: 12,
+          paddingBottom: 12,
+          height: 88,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
-          marginTop: 4,
+          marginTop: 6,
+          fontFamily: 'Inter',
         },
       }}
     >

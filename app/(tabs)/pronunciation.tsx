@@ -304,7 +304,7 @@ export default function PronunciationScreen() {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={['#FF3B30', '#D70015']}
+        colors={['#34C759', '#30D158']}
         style={styles.header}
       >
         <View style={styles.headerContent}>
@@ -367,14 +367,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 6,
+    fontFamily: 'Inter',
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#FEE2E2',
+    fontSize: 17,
+    color: '#D1FAE5',
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   categorySection: {
     backgroundColor: '#FFFFFF',
@@ -393,39 +396,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryButtonActive: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#34C759',
   },
   categoryButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#374151',
+    fontFamily: 'Inter',
   },
   categoryButtonTextActive: {
     color: '#FFFFFF',
   },
   categoryButtonSubtext: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#6B7280',
-    marginTop: 2,
+    marginTop: 4,
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   categoryButtonSubtextActive: {
-    color: '#FEE2E2',
+    color: '#D1FAE5',
   },
   content: {
     flex: 1,
   },
   wordsContainer: {
-    padding: 20,
+    padding: 24,
   },
   wordCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
   },
   wordHeader: {
@@ -438,21 +444,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   wordText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 4,
+    marginBottom: 6,
+    fontFamily: 'Inter',
   },
   phoneticText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#6B7280',
     fontFamily: 'monospace',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   difficultyText: {
-    fontSize: 12,
-    color: '#FF3B30',
+    fontSize: 13,
+    color: '#34C759',
     fontWeight: '600',
+    fontFamily: 'Inter',
   },
   playExampleButton: {
     flexDirection: 'row',
@@ -464,9 +472,10 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   playExampleText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#3B82F6',
     fontWeight: '600',
+    fontFamily: 'Inter',
   },
   practiceSection: {
     borderTopWidth: 1,
@@ -481,20 +490,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   recordButton: {
-    backgroundColor: '#FF3B30',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    backgroundColor: '#34C759',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
   recordButtonActive: {
-    backgroundColor: '#D70015',
+    backgroundColor: '#30D158',
   },
   recordingStatus: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#6B7280',
     fontWeight: '600',
+    fontFamily: 'Inter',
   },
   playbackButton: {
     flexDirection: 'row',
@@ -615,17 +625,17 @@ const styles = StyleSheet.create({
   },
   // Visual Phonetics Styles
   contentContainer: {
-    padding: 20,
+    padding: 24,
   },
   phoneticCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
   },
   phoneticHeader: {
@@ -635,10 +645,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   soundSymbol: {
-    backgroundColor: '#FF3B30',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#34C759',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -652,14 +662,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   phoneticTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 19,
+    fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 2,
+    marginBottom: 4,
+    fontFamily: 'Inter',
   },
   phoneticSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#6B7280',
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   visualButton: {
     flexDirection: 'row',
@@ -676,33 +689,39 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   phoneticDescription: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#374151',
-    lineHeight: 20,
-    marginBottom: 16,
+    lineHeight: 22,
+    marginBottom: 20,
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   tipsSection: {
     marginBottom: 16,
   },
   tipsTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#374151',
-    marginBottom: 8,
+    marginBottom: 10,
+    fontFamily: 'Inter',
   },
   tipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#1F2937',
-    marginBottom: 4,
+    marginBottom: 6,
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   practiceWords: {
     marginBottom: 0,
   },
   practiceWordsTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#374151',
-    marginBottom: 8,
+    marginBottom: 10,
+    fontFamily: 'Inter',
   },
   wordsGrid: {
     flexDirection: 'row',
@@ -719,9 +738,10 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   practiceWordText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#1F2937',
     fontWeight: '600',
+    fontFamily: 'Inter',
   },
   // Shadowing Styles
   shadowingCard: {

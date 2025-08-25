@@ -62,7 +62,7 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header with greeting */}
       <LinearGradient
-        colors={['#1E40AF', '#3B82F6']}
+        colors={['#007AFF', '#5AC8FA']}
         style={styles.header}
       >
         <View style={styles.headerContent}>
@@ -197,15 +197,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 6,
+    fontFamily: 'Inter',
   },
   subGreeting: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#E0E7FF',
-    marginBottom: 20,
+    marginBottom: 24,
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -217,32 +220,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginTop: 4,
+    marginTop: 6,
+    fontFamily: 'Inter',
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#E0E7FF',
-    marginTop: 2,
+    marginTop: 4,
+    fontFamily: 'Inter',
+    fontWeight: '500',
   },
   goalSection: {
     margin: 20,
-    padding: 20,
+    padding: 24,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 16,
+    marginBottom: 20,
+    fontFamily: 'Inter',
   },
   goalProgress: {
     gap: 12,
@@ -251,13 +258,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   goalText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: '#374151',
+    fontFamily: 'Inter',
   },
   goalSubtext: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#6B7280',
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   progressBar: {
     height: 8,
@@ -276,17 +286,17 @@ const styles = StyleSheet.create({
   },
   moduleCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 12,
+    borderRadius: 20,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
   },
   moduleContent: {
     flexDirection: 'row',
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
   },
   moduleIcon: {
@@ -301,15 +311,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   moduleTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 2,
+    marginBottom: 4,
+    fontFamily: 'Inter',
   },
   moduleSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#6B7280',
-    marginBottom: 8,
+    marginBottom: 12,
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   moduleProgress: {
     flexDirection: 'row',
@@ -328,10 +341,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   moduleProgressText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: '#6B7280',
-    minWidth: 30,
+    minWidth: 32,
+    fontFamily: 'Inter',
   },
   quickActions: {
     margin: 20,
@@ -343,19 +357,22 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 16,
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   actionButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#FFFFFF',
+    fontFamily: 'Inter',
   },
   actionButtonSubtext: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#E0E7FF',
+    fontFamily: 'Inter',
+    fontWeight: '400',
   },
   bottomPadding: {
     height: 20,
