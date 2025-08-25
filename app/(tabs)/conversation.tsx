@@ -198,7 +198,12 @@ export default function ConversationScreen() {
                 <TouchableOpacity 
                   style={styles.followUpContainer}
                   onPress={() => {
-                    setInputText(message.followUpQuestion || '');
+                    // Clear input and focus on it to let user type their own response
+                    setInputText('');
+                    // Scroll to bottom to show input area
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
                   }}
                 >
                   <View style={styles.followUpHeader}>
