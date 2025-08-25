@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Send, Mic, MicOff, Volume2, RotateCcw, BookOpen, AlertCircle, MessageSquare, Zap, Globe } from 'lucide-react-native';
 import { useConversation } from '@/hooks/useConversation';
@@ -61,7 +61,11 @@ export default function ConversationScreen() {
   ];
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
       {/* Header */}
       <LinearGradient
         colors={['#007AFF', '#5AC8FA']}
@@ -253,7 +257,7 @@ export default function ConversationScreen() {
           <Text style={styles.recordingText}>🎤 録音中... Recording...</Text>
         )}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -354,6 +358,7 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
+    marginBottom: Platform.OS === 'android' ? 10 : 0,
   },
   messagesContent: {
     padding: 24,
@@ -568,6 +573,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
   },
   inputRow: {
     flexDirection: 'row',
