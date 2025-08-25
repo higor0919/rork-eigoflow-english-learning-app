@@ -197,13 +197,15 @@ export default function ConversationScreen() {
               {message.role === 'assistant' && message.followUpQuestion && (
                 <TouchableOpacity 
                   style={styles.followUpContainer}
-                  onPress={() => {
-                    // Clear input and focus on it to let user type their own response
-                    setInputText('');
-                    // Scroll to bottom to show input area
-                    setTimeout(() => {
-                      scrollViewRef.current?.scrollToEnd({ animated: true });
-                    }, 100);
+                  onPress={async () => {
+                    // Send the follow-up question to continue the conversation
+                    if (message.followUpQuestion) {
+                      await sendMessage(message.followUpQuestion);
+                      // Scroll to bottom after sending
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                      }, 100);
+                    }
                   }}
                 >
                   <View style={styles.followUpHeader}>
@@ -211,7 +213,7 @@ export default function ConversationScreen() {
                     <Text style={styles.followUpTitle}>💭 続けて話してみましょう Continue the Conversation</Text>
                   </View>
                   <Text style={styles.followUpQuestion}>{message.followUpQuestion}</Text>
-                  <Text style={styles.followUpHint}>タップして回答 Tap to respond</Text>
+                  <Text style={styles.followUpHint}>タップして続ける Tap to continue</Text>
                 </TouchableOpacity>
               )}
             </View>
