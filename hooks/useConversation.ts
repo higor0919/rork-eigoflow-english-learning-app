@@ -406,7 +406,7 @@ Rules:
     try {
       if (Platform.OS === 'web') {
         // Web implementation
-        if (mediaRecorderRef.current) {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
           return new Promise((resolve) => {
             mediaRecorderRef.current!.onstop = async () => {
               const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
@@ -414,6 +414,10 @@ Rules:
               // Stop all tracks
               const stream = mediaRecorderRef.current!.stream;
               stream.getTracks().forEach(track => track.stop());
+              
+              // Clean up references
+              mediaRecorderRef.current = null;
+              audioChunksRef.current = [];
               
               // Send to speech-to-text API
               const transcription = await transcribeAudio(audioBlob);
@@ -426,32 +430,65 @@ Rules:
       } else {
         // Mobile implementation
         if (recordingRef.current) {
-          await recordingRef.current.stopAndUnloadAsync();
-          const uri = recordingRef.current.getURI();
+          const recording = recordingRef.current;
           
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-          
-          if (uri) {
-            // Create file object for mobile
-            const uriParts = uri.split('.');
-            const fileType = uriParts[uriParts.length - 1];
+          try {
+            // Check if recording is still valid before stopping
+            const status = await recording.getStatusAsync();
+            if (!status.canRecord) {
+              console.log('Recording is not in a valid state, cannot stop');
+              recordingRef.current = null;
+              return null;
+            }
             
-            const audioFile = {
-              uri,
-              name: "recording." + fileType,
-              type: "audio/" + fileType
-            } as any;
+            await recording.stopAndUnloadAsync();
+            const uri = recording.getURI();
             
-            // Send to speech-to-text API
-            const transcription = await transcribeAudio(audioFile);
+            // Clean up reference immediately after getting URI
             recordingRef.current = null;
-            return transcription;
+            
+            // Reset audio mode
+            await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+            
+            if (uri) {
+              // Create file object for mobile
+              const uriParts = uri.split('.');
+              const fileType = uriParts[uriParts.length - 1];
+              
+              const audioFile = {
+                uri,
+                name: "recording." + fileType,
+                type: "audio/" + fileType
+              } as any;
+              
+              // Send to speech-to-text API
+              const transcription = await transcribeAudio(audioFile);
+              return transcription;
+            }
+          } catch (recordingError) {
+            console.error('Error with recording operations:', recordingError);
+            // Clean up reference on error
+            recordingRef.current = null;
+            
+            // Try to reset audio mode even on error
+            try {
+              await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+            } catch (audioModeError) {
+              console.error('Error resetting audio mode:', audioModeError);
+            }
+            
+            throw recordingError;
           }
         }
       }
     } catch (error) {
       console.error('Error stopping recording:', error);
       Alert.alert('エラー', '録音の停止中にエラーが発生しました。');
+      
+      // Ensure cleanup on any error
+      recordingRef.current = null;
+      mediaRecorderRef.current = null;
+      audioChunksRef.current = [];
     }
     
     return null;
