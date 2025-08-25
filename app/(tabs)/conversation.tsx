@@ -409,14 +409,18 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginBottom: 20,
+    width: '100%',
+    flexDirection: 'column',
   },
   userMessage: {
     alignItems: 'flex-end',
+    width: '100%',
   },
   aiMessage: {
     alignItems: 'flex-start',
     flexDirection: 'row',
     gap: 8,
+    width: '100%',
   },
   aiAvatar: {
     width: 28,
@@ -430,6 +434,7 @@ const styles = StyleSheet.create({
   messageContent: {
     flex: 1,
     maxWidth: '85%',
+    minWidth: 0,
   },
   messageBubble: {
     borderRadius: 18,
@@ -438,6 +443,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    flexShrink: 1,
   },
   userMessageBubble: {
     backgroundColor: '#007AFF',
@@ -465,6 +471,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: '400',
     padding: 14,
+    flexWrap: 'wrap',
   },
   userMessageText: {
     color: '#FFFFFF',
